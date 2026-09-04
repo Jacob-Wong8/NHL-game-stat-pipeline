@@ -1,0 +1,5 @@
+# Runtime dependencies
+# The current ingestion code uses only Python's standard library.
+
+# Development/testing (optional)
+# pytest>=8.0
