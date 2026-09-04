@@ -1,0 +1,12 @@
+#downloaded and generated data
+data/raw/*
+!data/raw/.gitkeep
+data/extracted/*
+!data/extracted/.gitkeep
+
+#python cache
+__pycache__/
+*.pyc
+
+#virtual environment
+.venv/

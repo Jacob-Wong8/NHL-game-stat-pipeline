@@ -54,13 +54,48 @@ An optional Streamlit app can sit on top of this join layer to visualize the com
 
 Airflow is intentionally excluded from this project. It is already covered by existing internship experience, so including it here would add no new resume value.
 
+## Project Structure
+
+```text
+NHL-game-stat-pipeline/
+├── README.md
+├── PROJECT_CONTEXT.md
+├── LICENSE
+├── .gitignore
+│
+├── data/
+│   ├── raw/nhl/                 # downloaded API responses
+│   ├── extracted/               # flattened event records
+│   └── sample/                  # small local datasets and game IDs
+│
+├── ingestion/
+│   ├── fetch_game.py
+│   └── extract_plays.py
+│
+├── streaming/
+│   ├── producer/                # Kafka producer
+│   └── schemas/                 # shared event schemas
+│
+├── databricks/                  # bronze, silver, and gold jobs
+├── batch/
+│   ├── hockey_reference/
+│   └── bigquery/
+├── dbt/                         # staging, intermediate, and marts models
+├── join/                        # live-versus-historical comparison
+├── app/                         # optional Streamlit UI
+└── tests/
+```
+
+Raw API responses belong under `data/raw/nhl/`. Generated flattened output belongs under `data/extracted/`; small files used for local development belong under `data/sample/`. Credentials and environment-specific configuration should remain outside version control.
+
 ## Project Status
 
 Currently built:
-- `fetch_game.py`: fetches raw play-by-play JSON from the NHL API for a given game ID and saves it locally.
-- `extract_plays.py`: flattens the raw JSON into clean, per-event rows, ready to be published to Kafka.
+- `ingestion/fetch_game.py`: fetches raw play-by-play JSON from the NHL API for a given game ID.
+- Sample NHL game responses and game IDs are stored in `data/sample/`.
 
 Not yet built:
+- `ingestion/extract_plays.py`: flattens raw JSON into clean, per-event rows.
 - Kafka producer to replay extracted rows onto a topic.
 - Databricks Structured Streaming consumer computing rolling aggregates.
 - Batch path from Hockey Reference through BigQuery and dbt.
