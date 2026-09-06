@@ -24,7 +24,7 @@ This is one pipeline, built around streaming. A historical baseline (skater seas
 
 This flow produces the skater's observed, in-game goals/assists/shots for a selected `game_id`:
 
-1. **Fetch play-by-play** — `ingestion/fetch_game.py` uses the NHL API to retrieve the game's play-by-play JSON.
+1. **Fetch play-by-play** — `pipelines/actual/ingestion/fetch_game.py` uses the NHL API to retrieve the game's play-by-play JSON.
 2. **Store raw events** — the raw API response is stored in AWS S3, with local copies kept under `data/raw/nhl/` for development and testing.
 3. **Publish a simulated live feed** — a Python Kafka producer reads the historical events and publishes them to Kafka with artificial delays.
 4. **Process the stream** — Databricks Structured Streaming reads the Kafka events, filters to goal/shot events, removes duplicates, and calculates rolling goals, assists, and shots per skater.
@@ -65,20 +65,19 @@ NHL-game-stat-pipeline/
 │   ├── extracted/               # flattened event records
 │   └── sample/                  # small local datasets and game IDs
 │
-├── ingestion/
-│   ├── fetch_game.py
-│   └── extract_plays.py
-│
-├── streaming/
-│   ├── producer/                # Kafka producer
-│   └── schemas/                 # shared event schemas
-│
-├── databricks/                  # bronze, silver, and gold jobs
-├── batch/
-│   ├── hockey_reference/
-│   └── bigquery/
-├── dbt/                         # staging, intermediate, and marts models
-├── join/                        # live-versus-historical comparison
+├── pipelines/
+│   ├── actual/
+│   │   ├── ingestion/
+│   │   ├── producer/             # Kafka producer
+│   │   └── databricks/           # bronze, silver, and gold jobs
+│   ├── expected/
+│   │   ├── batch/
+│   │   │   ├── hockey_reference/
+│   │   │   └── bigquery/
+│   │   └── dbt/                  # staging, intermediate, and marts models
+│   └── shared/
+│       ├── schemas/              # shared event schemas
+│       └── join/                 # live-versus-historical comparison
 ├── app/                         # optional Streamlit UI
 └── tests/
 ```
