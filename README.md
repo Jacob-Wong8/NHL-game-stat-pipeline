@@ -1,4 +1,4 @@
-# NHL Live vs. Historical Stats Pipeline
+# NHL Actual vs. Expected Stats Pipeline
 
 ## What This Is
 
