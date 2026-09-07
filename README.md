@@ -63,7 +63,6 @@ NHL-game-stat-pipeline/
 ├── data/
 │   ├── raw/nhl/                 # downloaded API responses
 │   ├── extracted/               # flattened event records
-│   └── sample/                  # small local datasets and game IDs
 │
 ├── pipelines/
 │   ├── actual/

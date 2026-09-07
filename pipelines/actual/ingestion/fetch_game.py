@@ -5,6 +5,7 @@ import argparse
 from pathlib import Path
 
 NHL_API_BASE = "https://api-web.nhle.com/v1/gamecenter"
+DEFAULT_OUT_DIR = Path(__file__).resolve().parents[3] / "data" / "raw" / "nhl"
 
 #fetches the play by play information using the unique game id
 def fetch_play_by_play(game_id: int) -> tuple[dict, int]:
@@ -37,7 +38,7 @@ def fetch_play_by_play(game_id: int) -> tuple[dict, int]:
 
 
 #saves the data as a json file
-def save_game(game_id: int, out_dir: str = ".") -> Path:
+def save_game(game_id: int, out_dir: str | Path = DEFAULT_OUT_DIR) -> Path:
     data, valid_game_id = fetch_play_by_play(game_id)
     out_path = Path(out_dir) / f"play_by_play_{valid_game_id}.json"
     with open(out_path, "w") as f:
@@ -48,6 +49,6 @@ def save_game(game_id: int, out_dir: str = ".") -> Path:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("game_id", type=int, help="NHL game ID, e.g. 2025030213")
-    parser.add_argument("--out-dir", default=".")
+    parser.add_argument("--out-dir", default=DEFAULT_OUT_DIR)
     args = parser.parse_args()
     save_game(args.game_id, args.out_dir)
