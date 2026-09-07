@@ -1,0 +1,31 @@
+{
+  "id": 2025030212,
+  "plays": [
+    {
+      "eventId": 42,
+      "periodDescriptor": {
+        "number": 2,
+        "periodType": "REG"
+      },
+      "timeInPeriod": "05:12",
+      "timeRemaining": "14:48",
+      "typeDescKey": "goal",
+      "details": {
+        "scoringPlayerId": 8478402
+      }
+    },
+    {
+      "eventId": 43,
+      "periodDescriptor": {
+        "number": 2,
+        "periodType": "REG"
+      },
+      "timeInPeriod": "07:30",
+      "timeRemaining": "12:30",
+      "typeDescKey": "shot-on-goal",
+      "details": {
+        "shootingPlayerId": 8478402
+      }
+    }
+  ]
+}

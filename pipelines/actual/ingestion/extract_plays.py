@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Any
 
 
-def extract_plays(data: dict[str, Any], game_id: int | None = None) -> list[dict[str, Any]]:
+def extract_plays(data: Any, game_id: int | None = None) -> list[dict[str, Any]]:
 	"""Return the plays from an NHL API response as flat, Kafka-ready records."""
 	if not isinstance(data, dict):
 		raise ValueError("The game data must be a JSON object.")
