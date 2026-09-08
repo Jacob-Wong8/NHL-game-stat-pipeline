@@ -5,7 +5,7 @@ import argparse
 from pathlib import Path
 
 NHL_API_BASE = "https://api-web.nhle.com/v1/gamecenter"
-DEFAULT_OUT_DIR = Path(__file__).resolve().parents[3] / "data" / "raw" / "nhl"
+DEFAULT_OUT_DIR = Path(__file__).resolve().parents[3] / "data" / "raw" / "nhl" #output directory of the json file
 
 #fetches the play by play information using the unique game id
 def fetch_play_by_play(game_id: int) -> tuple[dict, int]:
@@ -15,7 +15,7 @@ def fetch_play_by_play(game_id: int) -> tuple[dict, int]:
                 raise ValueError("Game ID must be a positive integer.")
 
             url = f"{NHL_API_BASE}/{game_id}/play-by-play"
-            req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+            req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"}) #http request for the NHL API
             with urllib.request.urlopen(req, timeout=15) as resp:
                 data = json.load(resp)
 
@@ -24,9 +24,11 @@ def fetch_play_by_play(game_id: int) -> tuple[dict, int]:
 
             return data, game_id
 
-        except (urllib.error.HTTPError, urllib.error.URLError, ValueError, json.JSONDecodeError) as exc:
-            print(f"Invalid or unavailable NHL game ID: {exc}")
+        except (urllib.error.HTTPError, urllib.error.URLError, ValueError, json.JSONDecodeError) as e:
+            print(f"Invalid or unavailable NHL game ID: {e}")
             retry = input("Enter a valid NHL game ID to try again, or press Enter to exit: ").strip()
+
+            #if the user presses Enter
             if not retry:
                 raise SystemExit("Exiting...")
 
@@ -40,7 +42,7 @@ def fetch_play_by_play(game_id: int) -> tuple[dict, int]:
 #saves the data as a json file
 def save_game(game_id: int, out_dir: str | Path = DEFAULT_OUT_DIR) -> Path:
     data, valid_game_id = fetch_play_by_play(game_id)
-    out_path = Path(out_dir) / f"play_by_play_{valid_game_id}.json"
+    out_path = Path(out_dir) / f"play_by_play_{valid_game_id}.json" #output path of the json file
     with open(out_path, "w") as f:
         json.dump(data, f)
     print(f"Saved game {valid_game_id} -> {out_path} ({len(data.get('plays', []))} events)")
