@@ -1,4 +1,4 @@
-"""Flatten an NHL play-by-play response into one JSON row per play."""
+# an NHL play-by-play response into one JSON row per play
 
 import argparse
 import json
@@ -8,19 +8,26 @@ from typing import Any
 
 def extract_plays(data: Any, game_id: int | None = None) -> list[dict[str, Any]]:
 	"""Return the plays from an NHL API response as flat, Kafka-ready records."""
+
+	#validate the response structure
 	if not isinstance(data, dict):
 		raise ValueError("The game data must be a JSON object.")
 
 	plays = data.get("plays")
+
+	#require a list of plays
 	if not isinstance(plays, list):
 		raise ValueError("The game data must contain a plays list.")
 
+	#use the provided game id when available
 	resolved_game_id = game_id if game_id is not None else data.get("id")
 	rows: list[dict[str, Any]] = []
 	for play in plays:
+		#validate each play before flattening it
 		if not isinstance(play, dict):
 			raise ValueError("Every play must be a JSON object.")
 
+		#extract nested period information
 		period = play.get("periodDescriptor") or {}
 		rows.append(
 			{
@@ -40,10 +47,12 @@ def extract_plays(data: Any, game_id: int | None = None) -> list[dict[str, Any]]
 
 def load_plays(input_path: str | Path) -> list[dict[str, Any]]:
 	"""Load and flatten a JSON file produced by ``fetch_game.py``."""
+	#load the raw game response
 	path = Path(input_path)
 	with path.open(encoding="utf-8") as input_file:
 		data = json.load(input_file)
 
+	#read the game id from the input filename
 	game_id = path.stem.removeprefix("play_by_play_")
 	try:
 		parsed_game_id = int(game_id)
@@ -58,10 +67,13 @@ def save_extracted_plays(
 	output_path: str | Path,
 ) -> Path:
 	"""Write flattened plays as newline-delimited JSON for Kafka ingestion."""
+	#flatten the input response
 	rows = load_plays(input_path)
 	path = Path(output_path)
+	#create missing output directories
 	path.parent.mkdir(parents=True, exist_ok=True)
 	with path.open("w", encoding="utf-8") as output_file:
+		#write one compact json object per line
 		for row in rows:
 			output_file.write(json.dumps(row, separators=(",", ":")) + "\n")
 	return path
