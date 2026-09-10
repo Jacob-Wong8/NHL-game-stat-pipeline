@@ -6,4 +6,4 @@ __pycache__/
 .venv/
 
 #pytest command
-tests/test_command.txt
+test_command.txt
