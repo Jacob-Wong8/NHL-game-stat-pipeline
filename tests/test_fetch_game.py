@@ -37,6 +37,16 @@ class TestFetchGame(unittest.TestCase):
 		self.assertEqual(data, payload)
 		self.assertEqual(game_id, 2025030213)
 
+	@patch("pipelines.actual.ingestion.fetch_game.input", return_value="2025030213")
+	def test_non_integer_game_id_can_be_retried(self, _mock_input):
+		payload = {"plays": []}
+		self.mock_response(payload)
+
+		data, game_id = fetch_play_by_play("fffff")
+
+		self.assertEqual(data, payload)
+		self.assertEqual(game_id, 2025030213)
+
 	@patch("pipelines.actual.ingestion.fetch_game.save_extracted_plays")
 	@patch("pipelines.actual.ingestion.fetch_game.fetch_play_by_play")
 	def test_save_game_writes_json_and_extracts_plays(self, mock_fetch, mock_save_extracted):

@@ -14,9 +14,10 @@ DEFAULT_OUT_DIR = Path(__file__).resolve().parents[3] / "data" / "raw" / "nhl" #
 DEFAULT_EXTRACTED_OUT_DIR = Path(__file__).resolve().parents[3] / "data" / "extracted"
 
 #fetches the play by play information using the unique game id
-def fetch_play_by_play(game_id: int) -> tuple[dict, int]:
+def fetch_play_by_play(game_id: int | str) -> tuple[dict, int]:
     while True:
         try:
+            game_id = int(game_id)
             if game_id <= 0:
                 raise ValueError("Game ID must be a positive integer.")
 
@@ -60,7 +61,7 @@ def save_game(game_id: int, out_dir: str | Path = DEFAULT_OUT_DIR) -> Path:
  
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("game_id", type=int, help="NHL game ID, e.g. 2025030213")
+    parser.add_argument("game_id", help="NHL game ID, e.g. 2025030213")
     parser.add_argument("--out-dir", default=DEFAULT_OUT_DIR)
     args = parser.parse_args()
     save_game(args.game_id, args.out_dir)
