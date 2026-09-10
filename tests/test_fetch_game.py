@@ -37,8 +37,9 @@ class TestFetchGame(unittest.TestCase):
 		self.assertEqual(data, payload)
 		self.assertEqual(game_id, 2025030213)
 
+	@patch("pipelines.actual.ingestion.fetch_game.save_extracted_plays")
 	@patch("pipelines.actual.ingestion.fetch_game.fetch_play_by_play")
-	def test_save_game_writes_json_to_output_directory(self, mock_fetch):
+	def test_save_game_writes_json_and_extracts_plays(self, mock_fetch, mock_save_extracted):
 		payload = {"plays": [{"eventId": 1}]}
 		mock_fetch.return_value = (payload, 2025030213)
 
@@ -46,6 +47,10 @@ class TestFetchGame(unittest.TestCase):
 			output_path = save_game(2025030213, temp_dir)
 
 			self.assertEqual(output_path, Path(temp_dir) / "play_by_play_2025030213.json")
+			mock_save_extracted.assert_called_once_with(
+				output_path,
+				Path(__file__).parents[1] / "data" / "extracted" / "play_by_play_2025030213.jsonl",
+			)
 			with output_path.open() as output_file:
 				self.assertEqual(json.load(output_file), payload)
 
