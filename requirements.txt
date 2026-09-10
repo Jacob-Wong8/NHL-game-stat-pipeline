@@ -1,5 +1,4 @@
-# Runtime dependencies
-# The current ingestion code uses only Python's standard library.
+confluent-kafka>=2.5.0
 
-# Development/testing (optional)
-# pytest>=8.0
+# Development/testing
+pytest>=8.0
