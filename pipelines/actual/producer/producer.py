@@ -32,15 +32,30 @@ def load_events(input_path: str | Path, game_id: int) -> list[dict[str, Any]]:
 	return events
 
 
+def load_properties(properties_path: str | Path) -> dict[str, str]:
+	"""Load Kafka client settings from a Java-style properties file."""
+	properties: dict[str, str] = {}
+	with Path(properties_path).open(encoding="utf-8") as properties_file:
+		for line_number, line in enumerate(properties_file, 1):
+			line = line.strip()
+			if not line or line.startswith("#"):
+				continue
+			if "=" not in line:
+				raise ValueError(f"Invalid property on line {line_number}: {line}")
+			key, value = line.split("=", 1)
+			properties[key.strip()] = value.strip()
+	return properties
+
+
 def stream_events(
 	events: list[dict[str, Any]],
 	topic: str,
-	bootstrap_servers: str = "localhost:9092",
+	properties_path: str | Path = "kafka.properties",
 	producer: Producer | None = None,
 	sleep: Callable[[float], None] = time.sleep,
 ) -> None:
 	"""Publish events using game-time gaps compressed into three minutes."""
-	kafka_producer = producer or Producer({"bootstrap.servers": bootstrap_servers})
+	kafka_producer = producer or Producer(load_properties(properties_path))
 	previous_time = None
 	for event in events:
 		current_time = game_time_seconds(event)
@@ -61,11 +76,16 @@ def main() -> None:
 	parser.add_argument("input_path", type=Path)
 	parser.add_argument("game_id", type=int)
 	parser.add_argument("topic")
-	parser.add_argument("--bootstrap-servers", default="localhost:9092")
+	parser.add_argument(
+		"--properties",
+		type=Path,
+		default=Path("kafka.properties"),
+		help="Kafka client properties file",
+	)
 	args = parser.parse_args()
 
 	events = load_events(args.input_path, args.game_id)
-	stream_events(events, args.topic, args.bootstrap_servers)
+	stream_events(events, args.topic, args.properties)
 
 
 if __name__ == "__main__":
