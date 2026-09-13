@@ -14,3 +14,6 @@ confluent_keys.txt
 
 #any properties file
 *.properties
+
+#pat so i dont forget lol
+PAT.txt
