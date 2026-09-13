@@ -11,3 +11,6 @@ test_command.txt
 
 #confluent keys for kafka streaming into databricks
 confluent_keys.txt
+
+#any properties file
+*.properties
