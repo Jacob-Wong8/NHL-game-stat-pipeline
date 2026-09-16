@@ -7,7 +7,7 @@ from typing import Any, Callable
 from confluent_kafka import Producer
 
 
-GAME_PERIOD_SECONDS = 20 * 90
+GAME_PERIOD_SECONDS = 20 * 120
 STREAM_SECONDS = 3 * 60
 SPEEDUP = (3 * GAME_PERIOD_SECONDS) / STREAM_SECONDS
 
