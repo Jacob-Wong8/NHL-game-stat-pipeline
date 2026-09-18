@@ -13,6 +13,48 @@ NHL_API_BASE = "https://api-web.nhle.com/v1/gamecenter"
 DEFAULT_OUT_DIR = Path(__file__).resolve().parents[3] / "data" / "raw" / "nhl" #output directory of the json file
 DEFAULT_EXTRACTED_OUT_DIR = Path(__file__).resolve().parents[3] / "data" / "extracted"
 
+
+def extract_game_roster(game_data: dict) -> list[dict]:
+    """Return skaters from a game roster, excluding goalies and non-player entries."""
+    if not isinstance(game_data, dict):
+        raise ValueError("The game data must be a JSON object.")
+
+    roster = game_data.get("rosterSpots", [])
+    if not isinstance(roster, list):
+        raise ValueError("The game data must contain a rosterSpots list.")
+
+    skaters: list[dict] = []
+    for player in roster:
+        if not isinstance(player, dict):
+            continue
+
+        position_code = str(player.get("positionCode") or player.get("position") or "").upper()
+        if position_code == "G":
+            continue
+
+        first_name = player.get("firstName")
+        last_name = player.get("lastName")
+        if isinstance(first_name, dict):
+            first_name = first_name.get("default") or ""
+        if isinstance(last_name, dict):
+            last_name = last_name.get("default") or ""
+
+        full_name = " ".join(part for part in [str(first_name or "").strip(), str(last_name or "").strip()] if part)
+        if not full_name:
+            continue
+
+        skaters.append(
+            {
+                "player_id": player.get("playerId"),
+                "full_name": full_name,
+                "team_id": player.get("teamId"),
+                "position_code": position_code,
+            }
+        )
+
+    return skaters
+
+
 #fetches the play by play information using the unique game id
 def fetch_play_by_play(game_id: int | str) -> tuple[dict, int]:
     while True:
