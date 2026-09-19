@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 from typing import Any, Callable
 
-from pipelines.expected.batch.upload_to_s3 import upload_file_to_s3
+from pipelines.expected.batch.upload_to_gcs import upload_file_to_gcs
 from pipelines.expected.batch.hockey_reference.fetch_expected_stats import fetch_team_stats
 
 
@@ -39,11 +39,11 @@ def main() -> None:
     parser.add_argument("--teams", nargs="+", required=True, help="NHL team abbreviations, such as EDM CGY")
     parser.add_argument("--playoffs", action="store_true", help="Extract playoff stats instead of regular-season stats")
     parser.add_argument("--output", type=Path, required=True, help="Output JSONL path")
-    parser.add_argument("--bucket", required=True, help="S3 bucket name")
+    parser.add_argument("--bucket", required=True, help="Google Cloud Storage bucket name")
     parser.add_argument(
         "--prefix",
         default="expected/hockey_reference",
-        help="S3 key prefix; the output filename is appended",
+        help="GCS object prefix; the output filename is appended",
     )
     args = parser.parse_args()
 
@@ -54,7 +54,7 @@ def main() -> None:
             output_file.write(json.dumps(record, ensure_ascii=False, sort_keys=True) + "\n")
 
     print(f"Hockey Reference records -> {args.output} ({len(records)} players)")
-    print(f"Uploaded -> {upload_file_to_s3(args.output, args.bucket, args.prefix)}")
+    print(f"Uploaded -> {upload_file_to_gcs(args.output, args.bucket, args.prefix)}")
 
 
 if __name__ == "__main__":

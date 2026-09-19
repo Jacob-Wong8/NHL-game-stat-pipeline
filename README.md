@@ -8,7 +8,7 @@ This is one pipeline, built around streaming. A historical baseline (skater seas
 
 **Scope**: skaters only (no goalies). Stats tracked: **goals, assists, shots**.
 
-- **Prep (one-time/offline)**: historical skater stats scraped from Hockey Reference, landed in S3, loaded into BigQuery, transformed with dbt (staging → intermediate → marts) into a baseline table with season averages and percentile rank for each stat.
+- **Prep (one-time/offline)**: historical skater stats scraped from Hockey Reference, landed in Google Cloud Storage, loaded into BigQuery, transformed with dbt (staging → intermediate → marts) into a baseline table with season averages and percentile rank for each stat.
 - **Streaming pipeline (the core build)**: historical play-by-play events for a given game replayed via a Kafka producer, consumed by Databricks Structured Streaming for deduplication and rolling per-skater totals, written to Delta Lake on S3 in a bronze/silver/gold medallion pattern.
 - **Join/output**: compares the live rolling goals/assists/shots against the dbt historical baseline for a given skater, surfaced via an optional Streamlit app.
 
@@ -36,7 +36,7 @@ This flow produces the skater's observed, in-game goals/assists/shots for a sele
 This flow produces the historical baseline used to estimate what a skater's goals, assists, and shots would typically look like:
 
 1. **Collect historical statistics** — the Hockey Reference scraper collects skater game logs.
-2. **Land the source data** — AWS S3 stores the scraped historical data as the batch source.
+2. **Land the source data** — Google Cloud Storage stores the scraped historical data as the batch source.
 3. **Load the warehouse** — BigQuery loads the historical records for querying and transformation.
 4. **Build the baseline** — dbt models the BigQuery data through staging, intermediate, and marts layers to produce, per skater, a season average and percentile rank for goals, assists, and shots.
 5. **Prepare the comparison** — the join step reads the dbt historical baseline and matches it to the skater and game in the actual data. Streamlit can display the resulting live-vs-expected comparison.
@@ -45,6 +45,7 @@ This flow produces the historical baseline used to estimate what a skater's goal
 
 - **Kafka** — simulates live event ingestion
 - **Databricks (Structured Streaming, Delta Lake)** — stream processing, medallion architecture
+- **Google Cloud Storage** — expected historical stats batch storage
 - **AWS S3** — raw data lake storage, Delta table storage
 - **BigQuery** — historical stats warehouse
 - **dbt** — historical data transformation/modeling
