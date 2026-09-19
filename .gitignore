@@ -21,3 +21,15 @@ PAT.txt
 #aws stuff
 *.zip
 aws/
+
+# packaging artifacts
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# tooling caches
+.ruff_cache/
+.pytest_cache/
+.coverage
+htmlcov/

@@ -45,15 +45,37 @@ class TestConsumer(unittest.TestCase):
 		consumer.close.assert_called_once_with()
 
 	@patch("pipelines.actual.producer.consumer.Consumer")
-	def test_raises_for_kafka_message_errors_and_closes_consumer(self, consumer_class):
+	def test_fatal_kafka_error_still_raises_and_closes_consumer(self, consumer_class):
 		consumer = consumer_class.return_value
 		message = Mock()
-		message.error.return_value = "broker unavailable"
+		error = Mock()
+		error.fatal.return_value = True
+		message.error.return_value = error
 		consumer.poll.return_value = message
 
-		with self.assertRaisesRegex(RuntimeError, "broker unavailable"):
+		with self.assertRaises(RuntimeError):
 			consume_events("plays")
 
+		consumer.close.assert_called_once_with()
+
+	@patch("pipelines.actual.producer.consumer.Consumer")
+	@patch("builtins.print")
+	def test_non_fatal_kafka_error_logged_and_recoverable(self, print, consumer_class):
+		consumer = consumer_class.return_value
+		warning = Mock()
+		warning.fatal.return_value = False
+		good = Mock()
+		good.error.return_value = None
+		good.value.return_value = '{"event_id": 8, "game_id": 99}'
+		warning.error.return_value = warning
+		warning.value.return_value = None
+		consumer.poll.side_effect = [warning, good, KeyboardInterrupt]
+
+		with self.assertRaises(KeyboardInterrupt):
+			consume_events("plays")
+
+		print.assert_any_call("kafka warning: " + str(warning))
+		print.assert_called_with({"event_id": 8, "game_id": 99})
 		consumer.close.assert_called_once_with()
 
 

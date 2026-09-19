@@ -1,7 +1,4 @@
-import json
-import tempfile
 import unittest
-from pathlib import Path
 
 from pipelines.actual.ingestion.fetch_game import extract_game_roster
 from pipelines.expected.batch.hockey_reference.fetch_expected_stats import (

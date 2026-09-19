@@ -9,13 +9,20 @@ from confluent_kafka import Producer
 
 GAME_PERIOD_SECONDS = 20
 GAME_SPEEDUP = 40
-SPEEDUP = GAME_SPEEDUP
 
 
 def game_time_seconds(event: dict[str, Any]) -> int:
-	"""Return the event's position in the three-period game clock."""
-	minutes, seconds = event["time_in_period"].split(":")
-	return (int(event["period"]) - 1) * GAME_PERIOD_SECONDS + int(minutes) * 60 + int(seconds)
+	"""Return the event's position in the three-period game clock.
+
+	OT/shootout periods (periodDescriptor type "SO"/OT beyond 3) are treated as
+	a continuation of regulation, so replay pacing stays monotonic.
+	"""
+	try:
+		minutes, seconds = str(event["time_in_period"]).split(":", 1)
+		period = int(event["period"])
+	except (KeyError, ValueError) as error:
+		raise ValueError(f"Event {event.get('event_id')} has an unusable game clock: {error}") from error
+	return max(0, period - 1) * GAME_PERIOD_SECONDS + int(minutes) * 60 + int(seconds)
 
 
 def load_events(input_path: str | Path, game_id: int) -> list[dict[str, Any]]:
@@ -60,7 +67,7 @@ def stream_events(
 	for event in events:
 		current_time = game_time_seconds(event)
 		if previous_time is not None:
-			sleep(max(0, current_time - previous_time) / SPEEDUP)
+			sleep(max(0, current_time - previous_time) / GAME_SPEEDUP)
 		kafka_producer.produce(
 			topic,
 			key=str(event["game_id"]),

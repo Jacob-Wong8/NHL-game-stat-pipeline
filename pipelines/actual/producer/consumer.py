@@ -24,7 +24,12 @@ def consume_events(
 			if message is None:
 				continue
 			if message.error():
-				raise RuntimeError(message.error())
+				error = message.error()
+				# Kafka admin/timeout notices (no payload) are recoverable; keep consuming.
+				if getattr(error, "fatal", lambda: False)():
+					raise RuntimeError(error)
+				print(f"kafka warning: {error}")
+				continue
 			value = message.value()
 			if value is not None:
 				print(json.loads(value))

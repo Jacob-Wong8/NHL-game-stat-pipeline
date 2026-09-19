@@ -2,6 +2,7 @@ import argparse
 import inspect
 import json
 import re
+import unicodedata
 import urllib.error
 import urllib.request
 from pathlib import Path
@@ -51,7 +52,10 @@ TEAM_ID_TO_ABBREV = {
 
 
 def normalize_name(name: str) -> str:
-    return re.sub(r"[^a-z0-9]", "", (name or "").lower())
+    """Fold a player name to a comparable key: strip diacritics + non-alphanumerics."""
+    decomposed = unicodedata.normalize("NFKD", name or "")
+    stripped = "".join(char for char in decomposed if not unicodedata.combining(char))
+    return re.sub(r"[^a-z0-9]", "", stripped.lower())
 
 
 def infer_season_from_game_data(game_data: dict[str, Any]) -> int:
@@ -220,7 +224,7 @@ def build_expected_baseline_for_game(
 ) -> dict[str, dict[str, Any]]:
     """Build a per-skater expected baseline for a specific NHL game roster."""
     roster = extract_game_roster(game_data)
-    resolved_fetcher = fetch_team_stats_fn or fetch_team_stats or globals().get("fetch_team_stats")
+    resolved_fetcher = fetch_team_stats_fn or fetch_team_stats
     if resolved_fetcher is None:
         raise ValueError("A fetch_team_stats callback is required to build the expected baseline.")
 
