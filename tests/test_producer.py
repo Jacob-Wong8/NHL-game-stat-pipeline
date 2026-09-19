@@ -20,7 +20,7 @@ class TestProducer(unittest.TestCase):
 		stream_events(events, "plays", producer=producer, sleep=sleep)
 
 		self.assertEqual([call.args[0] for call in producer.produce.call_args_list], ["plays"] * 3)
-		self.assertEqual([call.args[0] for call in sleep.call_args_list], [30.0, 30.0])
+		self.assertEqual([call.args[0] for call in sleep.call_args_list], [0.25, 0.25])
 		self.assertEqual(producer.flush.call_count, 1)
 
 	def test_load_events_rejects_a_different_game_id(self):

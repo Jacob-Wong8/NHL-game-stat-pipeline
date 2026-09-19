@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 from typing import Any, Callable
 
+from pipelines.expected.batch.load_to_bigquery import load_gcs_jsonl_to_bigquery
 from pipelines.expected.batch.upload_to_gcs import upload_file_to_gcs
 from pipelines.expected.batch.hockey_reference.fetch_expected_stats import fetch_team_stats
 
@@ -60,6 +61,11 @@ def main() -> None:
         default="expected/hockey_reference",
         help="GCS object prefix; the output filename is appended",
     )
+    parser.add_argument(
+        "--bigquery-table",
+        required=True,
+        help="BigQuery destination table, such as project.dataset.raw_skater_stats",
+    )
     args = parser.parse_args()
 
     try:
@@ -75,7 +81,10 @@ def main() -> None:
             output_file.write(json.dumps(record, ensure_ascii=False, sort_keys=True) + "\n")
 
     print(f"Hockey Reference records -> {output_path} ({len(records)} players)")
-    print(f"Uploaded -> {upload_file_to_gcs(output_path, args.bucket, args.prefix)}")
+    gcs_uri = upload_file_to_gcs(output_path, args.bucket, args.prefix)
+    print(f"Uploaded -> {gcs_uri}")
+    rows_loaded = load_gcs_jsonl_to_bigquery(gcs_uri, args.bigquery_table)
+    print(f"Loaded {rows_loaded} rows -> {args.bigquery_table}")
 
 
 if __name__ == "__main__":
