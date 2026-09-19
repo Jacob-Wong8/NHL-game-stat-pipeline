@@ -4,13 +4,13 @@
 
 A streaming data engineering pipeline that compares a player's simulated "live" in-game performance against their historical baseline. Historical NHL play-by-play data is replayed with artificial delays through Kafka to mimic a live game feed — this is not real-time data, it's historical data made to behave like a stream. The project is parameterized by game ID, so any past game can be run through the pipeline.
 
-This is one pipeline, built around streaming. A historical baseline (skater season stats) is prepared ahead of time in BigQuery/dbt — it's reference data the pipeline reads from at the comparison step, not a second pipeline.
+This is one pipeline, built around streaming for the actual game data. A historical baseline (skater season stats) is prepared ahead of time in BigQuery/dbt and read directly by Streamlit as reference data. It is never sent through Kafka or Databricks.
 
 **Scope**: skaters only (no goalies). Stats tracked: **goals, assists, shots**.
 
 - **Prep (one-time/offline)**: historical skater stats scraped from Hockey Reference, landed in Google Cloud Storage, loaded into BigQuery, transformed with dbt (staging → intermediate → marts) into a baseline table with season averages and percentile rank for each stat.
 - **Streaming pipeline (the core build)**: historical play-by-play events for a given game replayed via a Kafka producer, consumed by Databricks Structured Streaming for deduplication and rolling per-skater totals, written to Delta Lake on S3 in a bronze/silver/gold medallion pattern.
-- **Join/output**: compares the live rolling goals/assists/shots against the dbt historical baseline for a given skater, surfaced via an optional Streamlit app.
+- **Comparison/UI**: Streamlit reads the Databricks gold output and the dbt historical baseline directly, compares the live totals with the baseline, and displays the result.
 
 ## What It Does
 
@@ -18,7 +18,7 @@ This is one pipeline, built around streaming. A historical baseline (skater seas
 2. Pulls historical play-by-play for a given `game_id`.
 3. Kafka producer replays the play-by-play for that game, simulating live event arrival.
 4. Databricks Structured Streaming consumes the stream, dedupes events, and computes rolling per-skater totals for goals, assists, and shots, written as Delta tables (bronze → silver → gold).
-5. A join step pulls the current rolling totals (gold) and the dbt historical baseline, and outputs a live-vs-expected comparison per skater, per stat.
+5. Streamlit reads the current rolling totals (gold) and the dbt historical baseline directly, then displays a live-vs-expected comparison per skater, per stat.
 
 ## Actual Data Flow
 
@@ -39,7 +39,7 @@ This flow produces the historical baseline used to estimate what a skater's goal
 2. **Land the source data** — Google Cloud Storage stores the scraped historical data as the batch source.
 3. **Load the warehouse** — BigQuery loads the historical records for querying and transformation.
 4. **Build the baseline** — dbt models the BigQuery data through staging, intermediate, and marts layers to produce, per skater, a season average and percentile rank for goals, assists, and shots.
-5. **Prepare the comparison** — the join step reads the dbt historical baseline and matches it to the skater and game in the actual data. Streamlit can display the resulting live-vs-expected comparison.
+5. **Provide reference data to the UI** — Streamlit reads the dbt mart directly and matches it with the actual totals from the Databricks gold table. The expected data does not pass through Kafka or Databricks.
 
 ## Tools
 
@@ -49,7 +49,7 @@ This flow produces the historical baseline used to estimate what a skater's goal
 - **AWS S3** — raw data lake storage, Delta table storage
 - **BigQuery** — historical stats warehouse
 - **dbt** — historical data transformation/modeling
-- **Streamlit** (optional) — UI for the live-vs-historical comparison
+- **Streamlit** — UI for the live-vs-historical comparison
 - **Kubernetes** (optional) — containerizing producer/consumer jobs
 
 ## Project Structure
@@ -78,6 +78,6 @@ NHL-game-stat-pipeline/
 │   └── shared/
 │       ├── schemas/              # shared event schemas
 │       └── join/                 # live-versus-historical comparison
-├── app/                         # optional Streamlit UI
+├── app/                         # Streamlit UI
 └── tests/
 ```

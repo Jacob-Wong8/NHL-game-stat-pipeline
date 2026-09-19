@@ -14,11 +14,11 @@ The project is built to demonstrate specific data engineering tools that are not
 
 This project covers skaters only. Goalies are explicitly out of scope, since shots and scoring stats mean something structurally different for a goalie (shots-against vs. shots-taken) and would require a separate stat model with no added resume value.
 
-The stats tracked on both the actual and expected side are goals, assists, and shots. These three were chosen because they are directly present in NHL play-by-play events, map cleanly to the same three columns on both the live and historical side, and are simple enough to keep the join layer scoped and demoable. No other stats (hits, giveaways, TOI, etc.) are in scope unless explicitly added later.
+The stats tracked on both the actual and expected side are goals, assists, and shots. These three were chosen because they are directly present in NHL play-by-play events, map cleanly to the same three columns on both the live and historical side, and are simple enough to keep the comparison scoped and demoable. No other stats (hits, giveaways, TOI, etc.) are in scope unless explicitly added later.
 
 ## The Two Paths
 
-The system has two independent data paths that produce data at different speeds and are joined together at the end.
+The system has two independent data paths. The actual-data path is streamed through Kafka and Databricks, while the expected-data path is batch-mode reference data read directly by Streamlit.
 
 ### Path 1: Batch (historical baseline)
 
@@ -28,9 +28,9 @@ Historical skater stats are pulled from Hockey Reference. That raw data lands in
 
 This path starts from a single game's play-by-play JSON pulled from the NHL API. A Python producer reads that JSON in event order and publishes each event to a Kafka topic, sleeping briefly between messages to simulate the pace of a real broadcast. A Databricks Structured Streaming job consumes that topic, deduplicates events, and computes rolling per-skater totals for goals, assists, and shots as the game progresses. The output is written as Delta Lake tables on S3 using a medallion pattern: bronze holds raw ingested events, silver holds cleaned and deduplicated events, gold holds the rolling goals/assists/shots totals per skater.
 
-### Join layer
+### Comparison and UI
 
-At query time, the live rolling goals/assists/shots for a skater from the streaming path is compared against that same skater's historical baseline (and percentile rank) from the batch path. The output is a delta per stat: how far above or below their normal baseline this skater is performing right now, in this specific game.
+At query time, Streamlit reads the live rolling goals/assists/shots from the Databricks gold output and the historical baseline (and percentile rank) from the dbt mart. It compares the two directly and displays a delta per stat: how far above or below their normal baseline this skater is performing right now, in this specific game. The expected data is never sent through Kafka or Databricks.
 
 ## Data Source Details
 
@@ -48,19 +48,19 @@ The game ID is always treated as a parameter, never hardcoded. Any script or pip
 
 ## Not Yet Built
 
-The Kafka producer that reads the extracted rows and publishes them to a topic with a delay between messages. The Databricks Structured Streaming consumer that reads that topic and computes rolling goals/assists/shots aggregates per skater. The batch path from Hockey Reference through BigQuery and dbt, including the percentile ranking logic. The join layer that compares live rolling aggregates against the historical baseline. The optional Streamlit app described below.
+The Kafka producer that reads the extracted rows and publishes them to a topic with a delay between messages. The Databricks Structured Streaming consumer that reads that topic and computes rolling goals/assists/shots aggregates per skater. The batch path from Hockey Reference through BigQuery and dbt, including the percentile ranking logic. The Streamlit integration that reads the Databricks gold output and dbt mart and displays their comparison.
 
 ## Streamlit App (Optional, Lowest Priority)
 
-If built, this is a thin visualization layer on top of the join layer, not a core pipeline component. It should not contain business logic. Its job is to read the already-joined comparison data and display it.
+This is a thin visualization layer over the two completed outputs, not another ingestion path. It should not stream the expected data or contain batch transformation logic. Its job is to read the Databricks gold output and dbt mart directly, compare them, and display the result.
 
 Expected layout: a game ID selector so the user can pick which replayed game to view. A live-updating panel showing the selected skater's current rolling goals, assists, and shots for the game in progress, refreshing frequently since it is reading from the fast streaming path. A second panel showing that same skater's historical baseline and percentile rank for the same three stats, refreshing less frequently since dbt runs on a slower schedule. A delta or comparison view making it visually obvious whether the skater is over or under performing relative to their baseline right now.
 
-This is the first component to cut if time is short. A working producer, consumer, and one working dbt model against BigQuery is a complete and demoable project even without this layer.
+A working producer, consumer, one working dbt model against BigQuery, and the Streamlit comparison view form the complete demoable project.
 
 ## Build Order and Priority
 
-The recommended build order is batch path first to validate BigQuery and dbt, then the Kafka producer, then the Databricks streaming consumer, and the join layer last, since it depends on both other paths being functional. This order was chosen to de-risk the parts with the most unknowns first rather than building infrastructure before confirming the core logic works.
+The recommended build order is batch path first to validate BigQuery and dbt, then the Kafka producer, then the Databricks streaming consumer, and Streamlit integration last. Streamlit depends on the dbt mart and Databricks gold output, but the expected data remains a direct batch-to-UI dependency rather than a streaming dependency.
 
 ## Constraints to Respect in Any Code Suggestions
 
