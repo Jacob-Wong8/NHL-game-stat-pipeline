@@ -17,3 +17,7 @@ confluent_keys.txt
 
 #pat so i dont forget lol
 PAT.txt
+
+#aws stuff
+*.zip
+aws/
