@@ -8,15 +8,19 @@ from pipelines.expected.batch.hockey_reference.fetch_expected_stats import fetch
 
 
 def extract_team_stats(
-    teams: list[str],
+    team_one: str,
+    team_two: str,
     season: int,
     playoffs: bool = False,
     fetcher: Callable[..., list[dict[str, Any]]] = fetch_team_stats,
 ) -> list[dict[str, Any]]:
-    """Return normalized Hockey Reference records for the requested teams."""
+    """Return normalized Hockey Reference records for two distinct teams."""
+    team_abbrevs = [team_one.upper(), team_two.upper()]
+    if team_abbrevs[0] == team_abbrevs[1]:
+        raise ValueError("team_one and team_two must be different teams")
+
     records: list[dict[str, Any]] = []
-    for team in teams:
-        team_abbrev = team.upper()
+    for team_abbrev in team_abbrevs:
         for player in fetcher(team_abbrev, season, playoffs=playoffs):
             records.append(
                 {
@@ -36,9 +40,20 @@ def extract_team_stats(
 def main() -> None:
     parser = argparse.ArgumentParser(description="Extract normalized Hockey Reference skater stats as JSONL.")
     parser.add_argument("--season", type=int, required=True, help="Season ending year, such as 2024")
-    parser.add_argument("--teams", nargs="+", required=True, help="NHL team abbreviations, such as EDM CGY")
+    parser.add_argument(
+        "--teams",
+        nargs=2,
+        required=True,
+        metavar=("TEAM1", "TEAM2"),
+        help="Two different NHL team abbreviations, such as EDM CGY",
+    )
     parser.add_argument("--playoffs", action="store_true", help="Extract playoff stats instead of regular-season stats")
-    parser.add_argument("--output", type=Path, required=True, help="Output JSONL path")
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=Path("data/expected"),
+        help="Directory for the generated JSONL file",
+    )
     parser.add_argument("--bucket", required=True, help="Google Cloud Storage bucket name")
     parser.add_argument(
         "--prefix",
@@ -47,14 +62,20 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    records = extract_team_stats(args.teams, args.season, playoffs=args.playoffs)
-    args.output.parent.mkdir(parents=True, exist_ok=True)
-    with args.output.open("w", encoding="utf-8") as output_file:
+    try:
+        records = extract_team_stats(args.teams[0], args.teams[1], args.season, playoffs=args.playoffs)
+    except ValueError as error:
+        parser.error(str(error))
+
+    team_one, team_two = (team.upper() for team in args.teams)
+    output_path = args.output_dir / f"{team_one}_{team_two}_SKATER_STATS.jsonl"
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    with output_path.open("w", encoding="utf-8") as output_file:
         for record in records:
             output_file.write(json.dumps(record, ensure_ascii=False, sort_keys=True) + "\n")
 
-    print(f"Hockey Reference records -> {args.output} ({len(records)} players)")
-    print(f"Uploaded -> {upload_file_to_gcs(args.output, args.bucket, args.prefix)}")
+    print(f"Hockey Reference records -> {output_path} ({len(records)} players)")
+    print(f"Uploaded -> {upload_file_to_gcs(output_path, args.bucket, args.prefix)}")
 
 
 if __name__ == "__main__":
