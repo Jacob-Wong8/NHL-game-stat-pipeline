@@ -1,0 +1,326 @@
+{
+  "Alex Newhook": {
+    "assists_per_game": 0.15789473684210525,
+    "games_played": 19,
+    "goals_per_game": 0.3684210526315789,
+    "player_id": 8481618,
+    "shots_per_game": 1.736842105263158,
+    "team_abbrev": "MTL",
+    "team_id": 8
+  },
+  "Alex Tuch": {
+    "assists_per_game": 0.23076923076923078,
+    "games_played": 13,
+    "goals_per_game": 0.3076923076923077,
+    "player_id": 8477949,
+    "shots_per_game": 3.5384615384615383,
+    "team_abbrev": "BUF",
+    "team_id": 7
+  },
+  "Alexandre Carrier": {
+    "assists_per_game": 0.3157894736842105,
+    "games_played": 19,
+    "goals_per_game": 0.05263157894736842,
+    "player_id": 8478851,
+    "shots_per_game": 0.3684210526315789,
+    "team_abbrev": "MTL",
+    "team_id": 8
+  },
+  "Alexandre Texier": {
+    "assists_per_game": 0.21052631578947367,
+    "games_played": 19,
+    "goals_per_game": 0.21052631578947367,
+    "player_id": 8480074,
+    "shots_per_game": 1.0,
+    "team_abbrev": "MTL",
+    "team_id": 8
+  },
+  "Arber Xhekaj": {
+    "assists_per_game": 0.07692307692307693,
+    "games_played": 13,
+    "goals_per_game": 0.07692307692307693,
+    "player_id": 8482964,
+    "shots_per_game": 0.6153846153846154,
+    "team_abbrev": "MTL",
+    "team_id": 8
+  },
+  "Beck Malenstyn": {
+    "assists_per_game": 0.15384615384615385,
+    "games_played": 13,
+    "goals_per_game": 0.07692307692307693,
+    "player_id": 8479359,
+    "shots_per_game": 0.6153846153846154,
+    "team_abbrev": "BUF",
+    "team_id": 7
+  },
+  "Bowen Byram": {
+    "assists_per_game": 0.23076923076923078,
+    "games_played": 13,
+    "goals_per_game": 0.3076923076923077,
+    "player_id": 8481524,
+    "shots_per_game": 2.230769230769231,
+    "team_abbrev": "BUF",
+    "team_id": 7
+  },
+  "Cole Caufield": {
+    "assists_per_game": 0.3684210526315789,
+    "games_played": 19,
+    "goals_per_game": 0.3157894736842105,
+    "player_id": 8481540,
+    "shots_per_game": 2.263157894736842,
+    "team_abbrev": "MTL",
+    "team_id": 8
+  },
+  "Conor Timmins": {
+    "assists_per_game": 0.15384615384615385,
+    "games_played": 13,
+    "goals_per_game": 0.0,
+    "player_id": 8479982,
+    "shots_per_game": 1.0,
+    "team_abbrev": "BUF",
+    "team_id": 7
+  },
+  "Ivan Demidov": {
+    "assists_per_game": 0.3157894736842105,
+    "games_played": 19,
+    "goals_per_game": 0.15789473684210525,
+    "player_id": 8484984,
+    "shots_per_game": 1.8421052631578947,
+    "team_abbrev": "MTL",
+    "team_id": 8
+  },
+  "Jack Quinn": {
+    "assists_per_game": 0.38461538461538464,
+    "games_played": 13,
+    "goals_per_game": 0.15384615384615385,
+    "player_id": 8482097,
+    "shots_per_game": 1.9230769230769231,
+    "team_abbrev": "BUF",
+    "team_id": 7
+  },
+  "Jake Evans": {
+    "assists_per_game": 0.42105263157894735,
+    "games_played": 19,
+    "goals_per_game": 0.10526315789473684,
+    "player_id": 8478133,
+    "shots_per_game": 1.105263157894737,
+    "team_abbrev": "MTL",
+    "team_id": 8
+  },
+  "Jason Zucker": {
+    "assists_per_game": 0.15384615384615385,
+    "games_played": 13,
+    "goals_per_game": 0.15384615384615385,
+    "player_id": 8475722,
+    "shots_per_game": 1.3846153846153846,
+    "team_abbrev": "BUF",
+    "team_id": 7
+  },
+  "Jordan Greenway": {
+    "assists_per_game": 0.07692307692307693,
+    "games_played": 13,
+    "goals_per_game": 0.15384615384615385,
+    "player_id": 8478413,
+    "shots_per_game": 0.5384615384615384,
+    "team_abbrev": "BUF",
+    "team_id": 7
+  },
+  "Josh Anderson": {
+    "assists_per_game": 0.10526315789473684,
+    "games_played": 19,
+    "goals_per_game": 0.2631578947368421,
+    "player_id": 8476981,
+    "shots_per_game": 1.5789473684210527,
+    "team_abbrev": "MTL",
+    "team_id": 8
+  },
+  "Josh Doan": {
+    "assists_per_game": 0.5384615384615384,
+    "games_played": 13,
+    "goals_per_game": 0.23076923076923078,
+    "player_id": 8482659,
+    "shots_per_game": 2.4615384615384617,
+    "team_abbrev": "BUF",
+    "team_id": 7
+  },
+  "Josh Norris": {
+    "assists_per_game": 0.0,
+    "games_played": 0,
+    "goals_per_game": 0.0,
+    "player_id": 8480064,
+    "shots_per_game": 0.0,
+    "team_abbrev": "BUF",
+    "team_id": 7
+  },
+  "Juraj Slafkovsk\u00fd": {
+    "assists_per_game": 0.0,
+    "games_played": 0,
+    "goals_per_game": 0.0,
+    "player_id": 8483515,
+    "shots_per_game": 0.0,
+    "team_abbrev": "MTL",
+    "team_id": 8
+  },
+  "Kaiden Guhle": {
+    "assists_per_game": 0.42105263157894735,
+    "games_played": 19,
+    "goals_per_game": 0.0,
+    "player_id": 8482087,
+    "shots_per_game": 0.631578947368421,
+    "team_abbrev": "MTL",
+    "team_id": 8
+  },
+  "Kirby Dach": {
+    "assists_per_game": 0.05263157894736842,
+    "games_played": 19,
+    "goals_per_game": 0.21052631578947367,
+    "player_id": 8481523,
+    "shots_per_game": 1.0,
+    "team_abbrev": "MTL",
+    "team_id": 8
+  },
+  "Konsta Helenius": {
+    "assists_per_game": 0.0,
+    "games_played": 4,
+    "goals_per_game": 0.5,
+    "player_id": 8484797,
+    "shots_per_game": 2.5,
+    "team_abbrev": "BUF",
+    "team_id": 7
+  },
+  "Lane Hutson": {
+    "assists_per_game": 0.6842105263157895,
+    "games_played": 19,
+    "goals_per_game": 0.15789473684210525,
+    "player_id": 8483457,
+    "shots_per_game": 1.5789473684210527,
+    "team_abbrev": "MTL",
+    "team_id": 8
+  },
+  "Mattias Samuelsson": {
+    "assists_per_game": 0.3076923076923077,
+    "games_played": 13,
+    "goals_per_game": 0.23076923076923078,
+    "player_id": 8480807,
+    "shots_per_game": 1.4615384615384615,
+    "team_abbrev": "BUF",
+    "team_id": 7
+  },
+  "Mike Matheson": {
+    "assists_per_game": 0.10526315789473684,
+    "games_played": 19,
+    "goals_per_game": 0.10526315789473684,
+    "player_id": 8476875,
+    "shots_per_game": 1.263157894736842,
+    "team_abbrev": "MTL",
+    "team_id": 8
+  },
+  "Nick Suzuki": {
+    "assists_per_game": 0.631578947368421,
+    "games_played": 19,
+    "goals_per_game": 0.21052631578947367,
+    "player_id": 8480018,
+    "shots_per_game": 2.1052631578947367,
+    "team_abbrev": "MTL",
+    "team_id": 8
+  },
+  "Noah Dobson": {
+    "assists_per_game": 0.07692307692307693,
+    "games_played": 13,
+    "goals_per_game": 0.0,
+    "player_id": 8480865,
+    "shots_per_game": 1.6153846153846154,
+    "team_abbrev": "MTL",
+    "team_id": 8
+  },
+  "Oliver Kapanen": {
+    "assists_per_game": 0.0,
+    "games_played": 7,
+    "goals_per_game": 0.0,
+    "player_id": 8482775,
+    "shots_per_game": 0.5714285714285714,
+    "team_abbrev": "MTL",
+    "team_id": 8
+  },
+  "Owen Power": {
+    "assists_per_game": 0.46153846153846156,
+    "games_played": 13,
+    "goals_per_game": 0.0,
+    "player_id": 8482671,
+    "shots_per_game": 0.6153846153846154,
+    "team_abbrev": "BUF",
+    "team_id": 7
+  },
+  "Peyton Krebs": {
+    "assists_per_game": 0.3076923076923077,
+    "games_played": 13,
+    "goals_per_game": 0.15384615384615385,
+    "player_id": 8481522,
+    "shots_per_game": 0.7692307692307693,
+    "team_abbrev": "BUF",
+    "team_id": 7
+  },
+  "Phillip Danault": {
+    "assists_per_game": 0.42105263157894735,
+    "games_played": 19,
+    "goals_per_game": 0.10526315789473684,
+    "player_id": 8476479,
+    "shots_per_game": 0.9473684210526315,
+    "team_abbrev": "MTL",
+    "team_id": 8
+  },
+  "Rasmus Dahlin": {
+    "assists_per_game": 0.7692307692307693,
+    "games_played": 13,
+    "goals_per_game": 0.3076923076923077,
+    "player_id": 8480839,
+    "shots_per_game": 3.5384615384615383,
+    "team_abbrev": "BUF",
+    "team_id": 7
+  },
+  "Ryan McLeod": {
+    "assists_per_game": 0.3076923076923077,
+    "games_played": 13,
+    "goals_per_game": 0.07692307692307693,
+    "player_id": 8480802,
+    "shots_per_game": 1.3076923076923077,
+    "team_abbrev": "BUF",
+    "team_id": 7
+  },
+  "Tage Thompson": {
+    "assists_per_game": 0.7692307692307693,
+    "games_played": 13,
+    "goals_per_game": 0.38461538461538464,
+    "player_id": 8479420,
+    "shots_per_game": 3.5384615384615383,
+    "team_abbrev": "BUF",
+    "team_id": 7
+  },
+  "Zach Benson": {
+    "assists_per_game": 0.3076923076923077,
+    "games_played": 13,
+    "goals_per_game": 0.38461538461538464,
+    "player_id": 8484145,
+    "shots_per_game": 2.0,
+    "team_abbrev": "BUF",
+    "team_id": 7
+  },
+  "Zach Metsa": {
+    "assists_per_game": 0.0,
+    "games_played": 2,
+    "goals_per_game": 0.5,
+    "player_id": 8484305,
+    "shots_per_game": 0.5,
+    "team_abbrev": "BUF",
+    "team_id": 7
+  },
+  "Zachary Bolduc": {
+    "assists_per_game": 0.21052631578947367,
+    "games_played": 19,
+    "goals_per_game": 0.15789473684210525,
+    "player_id": 8482737,
+    "shots_per_game": 0.9473684210526315,
+    "team_abbrev": "MTL",
+    "team_id": 8
+  }
+}

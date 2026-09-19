@@ -19,6 +19,10 @@ def extract_plays(data: Any, game_id: int | None = None) -> list[dict[str, Any]]
 	if not isinstance(plays, list):
 		raise ValueError("The game data must contain a plays list.")
 
+	roster_spots = data.get("rosterSpots", [])
+	if not isinstance(roster_spots, list):
+		raise ValueError("The game data must contain a rosterSpots list.")
+
 	#use the provided game id when available
 	resolved_game_id = game_id if game_id is not None else data.get("id")
 	rows: list[dict[str, Any]] = []
@@ -39,6 +43,7 @@ def extract_plays(data: Any, game_id: int | None = None) -> list[dict[str, Any]]
 				"time_remaining": play.get("timeRemaining"),
 				"event_type": play.get("typeDescKey"),
 				"details": play.get("details", {}),
+				"roster_spots": roster_spots,
 			}
 		)
 

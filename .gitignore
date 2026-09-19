@@ -4,3 +4,20 @@ __pycache__/
 
 #virtual environment
 .venv/
+
+#pytest command
+test_command.txt
+
+
+#confluent keys for kafka streaming into databricks
+confluent_keys.txt
+
+#any properties file
+*.properties
+
+#pat so i dont forget lol
+PAT.txt
+
+#aws stuff
+*.zip
+aws/

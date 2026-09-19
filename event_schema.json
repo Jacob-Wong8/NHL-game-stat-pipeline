@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "NHL Play Event",
+  "type": "object",
+  "required": [
+    "game_id",
+    "event_id",
+    "period",
+    "period_type",
+    "time_in_period",
+    "time_remaining",
+    "event_type",
+    "details"
+  ],
+  "properties": {
+    "game_id": { "type": "integer" },
+    "event_id": { "type": "integer" },
+    "period": { "type": "integer", "minimum": 1, "maximum": 3 },
+    "period_type": { "type": "string" },
+    "time_in_period": { "type": "string", "pattern": "^[0-9]{2}:[0-9]{2}$" },
+    "time_remaining": { "type": "string", "pattern": "^[0-9]{2}:[0-9]{2}$" },
+    "event_type": { "type": "string" },
+    "details": { "type": "object" }
+  }
+}

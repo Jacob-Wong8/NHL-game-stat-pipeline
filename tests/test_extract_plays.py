@@ -32,6 +32,7 @@ class TestExtractPlays(unittest.TestCase):
 					"time_remaining": "14:48",
 					"event_type": "goal",
 					"details": {"scoringPlayerId": 8478402},
+					"roster_spots": [],
 				},
 				{
 					"game_id": 2025030212,
@@ -42,8 +43,28 @@ class TestExtractPlays(unittest.TestCase):
 					"time_remaining": "12:30",
 					"event_type": "shot-on-goal",
 					"details": {"shootingPlayerId": 8478402},
+					"roster_spots": [],
 				}
 			],
+		)
+
+	def test_extract_plays_preserves_roster_spots(self):
+		data = self.load_fixture("play_by_play_2025030212.json")
+		data["rosterSpots"] = [
+			{
+				"playerId": 8478402,
+				"firstName": {"default": "Test"},
+				"lastName": {"default": "Player"},
+				"positionCode": "C",
+			}
+		]
+
+		rows = extract_plays(data)
+
+		self.assertEqual(rows[0]["roster_spots"][0]["playerId"], 8478402)
+		self.assertEqual(
+			rows[0]["roster_spots"][0]["firstName"]["default"],
+			"Test",
 		)
 
 	def test_extract_plays_uses_explicit_game_id(self):
