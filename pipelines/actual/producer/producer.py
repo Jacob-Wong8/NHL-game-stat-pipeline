@@ -9,13 +9,23 @@ from confluent_kafka import Producer
 
 GAME_PERIOD_SECONDS = 20
 GAME_SPEEDUP = 40
-SPEEDUP = GAME_SPEEDUP
 
 
 def game_time_seconds(event: dict[str, Any]) -> int:
-	"""Return the event's position in the three-period game clock."""
-	minutes, seconds = event["time_in_period"].split(":")
-	return (int(event["period"]) - 1) * GAME_PERIOD_SECONDS + int(minutes) * 60 + int(seconds)
+	"""Return the event's position in the game clock."""
+	try:
+		minutes, seconds = str(event["time_in_period"]).split(":", 1)
+		period = int(event["period"])
+		minutes = int(minutes)
+		seconds = int(seconds)
+	except (KeyError, TypeError, ValueError) as error:
+		event_id = event.get("event_id", "unknown")
+		raise ValueError(f"Event {event_id} has an unusable game clock: {error}") from error
+
+	if period < 1:
+		raise ValueError(f"Event {event.get('event_id', 'unknown')} has an invalid period: {period}")
+
+	return (period - 1) * GAME_PERIOD_SECONDS + minutes * 60 + seconds
 
 
 def load_events(input_path: str | Path, game_id: int) -> list[dict[str, Any]]:
@@ -60,7 +70,7 @@ def stream_events(
 	for event in events:
 		current_time = game_time_seconds(event)
 		if previous_time is not None:
-			sleep(max(0, current_time - previous_time) / SPEEDUP)
+			sleep(max(0, current_time - previous_time) / GAME_SPEEDUP)
 		kafka_producer.produce(
 			topic,
 			key=str(event["game_id"]),
