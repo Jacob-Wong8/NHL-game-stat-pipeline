@@ -85,7 +85,7 @@ def main() -> None:
 
     team_one, team_two = (team.upper() for team in args.teams)
     bigquery_table_id = build_bigquery_table_id(args.bigquery_table, team_one, team_two, args.season)
-    output_path = args.output_dir / f"{team_one}_{team_two}_SKATER_STATS.jsonl"
+    output_path = args.output_dir / f"{team_one}_{team_two}_{args.season}_SKATER_STATS.jsonl"
     output_path.parent.mkdir(parents=True, exist_ok=True)
     with output_path.open("w", encoding="utf-8") as output_file:
         for record in records:
