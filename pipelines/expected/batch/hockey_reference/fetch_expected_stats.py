@@ -40,7 +40,7 @@ TEAM_ID_TO_ABBREV = {
     25: "DAL",
     26: "LAK",
     27: "SJS",
-    28: "VGK",
+    28: "VEG",
     29: "CBJ",
     30: "MIN",
     31: "WPG",
