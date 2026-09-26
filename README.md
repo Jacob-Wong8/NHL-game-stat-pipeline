@@ -1,83 +1,36 @@
-# NHL Actual vs. Expected Stats Pipeline
+# NHL Actual vs. Expected Stats
 
-## What This Is
+This project compares a skater's performance in a past NHL game with their season averages. Historical play-by-play is replayed through Kafka to simulate a live game feed. The pipeline processes the events with Databricks and stores the results in Delta Lake tables on S3.
 
-A streaming data engineering pipeline that compares a player's simulated "live" in-game performance against their historical baseline. Historical NHL play-by-play data is replayed with artificial delays through Kafka to mimic a live game feed — this is not real-time data, it's historical data made to behave like a stream. The project is parameterized by game ID, so any past game can be run through the pipeline.
+The project covers skaters and tracks goals, assists, and shots.
 
-This is one pipeline, built around streaming for the actual game data. A historical baseline (skater season stats) is prepared ahead of time in BigQuery/dbt and read directly by Streamlit as reference data. It is never sent through Kafka or Databricks.
+## Data Pipelines
 
-**Scope**: skaters only (no goalies). Stats tracked: **goals, assists, shots**.
+**Actual:** Replays a past game's play-by-play as a simulated live feed. The Streamlit actual view shows the score, shots, time remaining, and selected skater stats.
 
-- **Prep (one-time/offline)**: historical skater stats scraped from Hockey Reference, landed in Google Cloud Storage, loaded into BigQuery, transformed with dbt (staging → intermediate → marts) into a baseline table with season averages and percentile rank for each stat.
-- **Streaming pipeline (the core build)**: historical play-by-play events for a given game replayed via a Kafka producer, consumed by Databricks Structured Streaming for deduplication and rolling per-skater totals, written to Delta Lake on S3 in a bronze/silver/gold medallion pattern.
-- **Comparison/UI**: Streamlit reads the Databricks gold output and the dbt historical baseline directly, compares the live totals with the baseline, and displays the result.
+Flow: Game play-by-play JSON → Kafka → S3 → Databricks bronze, silver, and gold Delta Lake tables → Streamlit actual view (left).
 
-## What It Does
+**Expected:** Calculates each player's average goals, assists, and shots per game from season stats for both teams. The Streamlit expected view shows the selected skater's averages.
 
-1. (Prep) Loads historical skater stats into BigQuery and models them with dbt into clean marts (season average + percentile rank for goals, assists, shots) — done once, not per run.
-2. Pulls historical play-by-play for a given `game_id`.
-3. Kafka producer replays the play-by-play for that game, simulating live event arrival.
-4. Databricks Structured Streaming consumes the stream, dedupes events, and computes rolling per-skater totals for goals, assists, and shots, written as Delta tables (bronze → silver → gold).
-5. Streamlit reads the current rolling totals (gold) and the dbt historical baseline directly, then displays a live-vs-expected comparison per skater, per stat.
+Flow: Team season stats → Python script → Google Cloud Platform/BigQuery → Streamlit expected view (right).
 
-## Actual Data Flow
+## Streamlit Interface
 
-This flow produces the skater's observed, in-game goals/assists/shots for a selected `game_id`:
-
-1. **Fetch play-by-play** — `pipelines/actual/ingestion/fetch_game.py` uses the NHL API to retrieve the game's play-by-play JSON.
-2. **Store raw events** — the raw API response is stored in AWS S3, with local copies kept under `data/raw/nhl/` for development and testing.
-3. **Publish a simulated live feed** — a Python Kafka producer reads the historical events and publishes them to Kafka with artificial delays.
-4. **Process the stream** — Databricks Structured Streaming reads the Kafka events, filters to goal/shot events, removes duplicates, and calculates rolling goals, assists, and shots per skater.
-5. **Persist the results** — Delta Lake writes the processed data to AWS S3 in bronze, silver, and gold tables. The gold table contains the current actual in-game totals per skater.
-6. **Prepare the comparison** — the join step reads the gold table and sends the actual skater totals to the live-vs-expected output. Streamlit can display the result.
-
-## Expected Data Flow
-
-This flow produces the historical baseline used to estimate what a skater's goals, assists, and shots would typically look like:
-
-1. **Collect historical statistics** — the Hockey Reference scraper collects skater game logs.
-2. **Land the source data** — Google Cloud Storage stores the scraped historical data as the batch source.
-3. **Load the warehouse** — BigQuery loads the historical records for querying and transformation.
-4. **Build the baseline** — dbt models the BigQuery data through staging, intermediate, and marts layers to produce, per skater, a season average and percentile rank for goals, assists, and shots.
-5. **Provide reference data to the UI** — Streamlit reads the dbt mart directly and matches it with the actual totals from the Databricks gold table. The expected data does not pass through Kafka or Databricks.
-
-## Tools
-
-- **Kafka** — simulates live event ingestion
-- **Databricks (Structured Streaming, Delta Lake)** — stream processing, medallion architecture
-- **Google Cloud Storage** — expected historical stats batch storage
-- **AWS S3** — raw data lake storage, Delta table storage
-- **BigQuery** — historical stats warehouse
-- **dbt** — historical data transformation/modeling
-- **Streamlit** — UI for the live-vs-historical comparison
-- **Kubernetes** (optional) — containerizing producer/consumer jobs
+The interface displays actual stats on the left and expected stats on the right. Each side has a skater dropdown. Selecting a player shows their game stats on the actual side and season averages on the expected side.
 
 ## Project Structure
 
 ```text
-NHL-game-stat-pipeline/
-├── README.md
-├── PROJECT_CONTEXT.md
-├── LICENSE
-├── .gitignore
-│
-├── data/
-│   ├── raw/nhl/                 # downloaded API responses
-│   ├── extracted/               # flattened event records
-│
-├── pipelines/
-│   ├── actual/
-│   │   ├── ingestion/
-│   │   ├── producer/             # Kafka producer
-│   │   └── databricks/           # bronze, silver, and gold jobs
-│   ├── expected/
-│   │   ├── batch/
-│   │   │   ├── hockey_reference/
-│   │   │   └── bigquery/
-│   │   └── dbt/                  # staging, intermediate, and marts models
-│   └── shared/
-│       ├── schemas/              # shared event schemas
-│       └── join/                 # live-versus-historical comparison
-├── app/                         # Streamlit UI
-└── tests/
+data/                              # Raw game JSON and extracted events
+pipelines/
+	actual/
+		ingestion/                     # Fetch and extract game events
+		producer/                      # Publish events to Kafka
+		databricks/                    # Stream processing jobs
+	expected/batch/                  # Calculate player season averages
+app/                               # Streamlit interface
+tests/                             # Pipeline tests
 ```
+
+
+Created this project because I love watching hockey and seeing the skater stats :)
