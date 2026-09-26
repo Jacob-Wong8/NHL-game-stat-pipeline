@@ -38,6 +38,16 @@ def extract_team_stats(
     return records
 
 
+def build_bigquery_table_id(base_table_id: str, team_one: str, team_two: str, season: int) -> str:
+    """Keep the project and dataset while naming the table for the matchup and season."""
+    table_parts = base_table_id.split(".")
+    if len(table_parts) != 3 or not all(table_parts):
+        raise ValueError("bigquery table must be qualified as project.dataset.table")
+
+    table_name = f"{team_one.upper()}_{team_two.upper()}_{season}"
+    return f"{table_parts[0]}.{table_parts[1]}.{table_name}"
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Extract normalized Hockey Reference skater stats as JSONL.")
     parser.add_argument("--season", type=int, required=True, help="Season ending year, such as 2024")
@@ -64,7 +74,7 @@ def main() -> None:
     parser.add_argument(
         "--bigquery-table",
         required=True,
-        help="BigQuery destination table, such as project.dataset.raw_skater_stats",
+        help="Qualified BigQuery table used for project.dataset, such as project.dataset.raw_skater_stats",
     )
     args = parser.parse_args()
 
@@ -74,7 +84,8 @@ def main() -> None:
         parser.error(str(error))
 
     team_one, team_two = (team.upper() for team in args.teams)
-    output_path = args.output_dir / f"{team_one}_{team_two}_SKATER_STATS.jsonl"
+    bigquery_table_id = build_bigquery_table_id(args.bigquery_table, team_one, team_two, args.season)
+    output_path = args.output_dir / f"{team_one}_{team_two}_{args.season}_SKATER_STATS.jsonl"
     output_path.parent.mkdir(parents=True, exist_ok=True)
     with output_path.open("w", encoding="utf-8") as output_file:
         for record in records:
@@ -83,8 +94,8 @@ def main() -> None:
     print(f"Hockey Reference records -> {output_path} ({len(records)} players)")
     gcs_uri = upload_file_to_gcs(output_path, args.bucket, args.prefix)
     print(f"Uploaded -> {gcs_uri}")
-    rows_loaded = load_gcs_jsonl_to_bigquery(gcs_uri, args.bigquery_table)
-    print(f"Loaded {rows_loaded} rows -> {args.bigquery_table}")
+    rows_loaded = load_gcs_jsonl_to_bigquery(gcs_uri, bigquery_table_id)
+    print(f"Loaded {rows_loaded} rows -> {bigquery_table_id}")
 
 
 if __name__ == "__main__":

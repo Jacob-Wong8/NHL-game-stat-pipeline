@@ -1,9 +1,14 @@
 import unittest
 
-from pipelines.expected.batch.hockey_reference.extract_batch import extract_team_stats
+from pipelines.expected.batch.hockey_reference.extract_batch import build_bigquery_table_id, extract_team_stats
 
 
 class TestExtractBatch(unittest.TestCase):
+    def test_builds_matchup_and_season_bigquery_table_name(self):
+        table_id = build_bigquery_table_id("project.dataset.raw_skater_stats", "veg", "pit", 2025)
+
+        self.assertEqual(table_id, "project.dataset.VEG_PIT_2025")
+
     def test_extracts_stats_for_two_distinct_teams(self):
         calls = []
 

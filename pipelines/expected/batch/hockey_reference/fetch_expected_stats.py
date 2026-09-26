@@ -40,7 +40,7 @@ TEAM_ID_TO_ABBREV = {
     25: "DAL",
     26: "LAK",
     27: "SJS",
-    28: "VGK",
+    28: "VEG",
     29: "CBJ",
     30: "MIN",
     31: "WPG",
@@ -220,7 +220,7 @@ def build_expected_baseline_for_game(
 ) -> dict[str, dict[str, Any]]:
     """Build a per-skater expected baseline for a specific NHL game roster."""
     roster = extract_game_roster(game_data)
-    resolved_fetcher = fetch_team_stats_fn or fetch_team_stats or globals().get("fetch_team_stats")
+    resolved_fetcher = fetch_team_stats_fn or fetch_team_stats
     if resolved_fetcher is None:
         raise ValueError("A fetch_team_stats callback is required to build the expected baseline.")
 
